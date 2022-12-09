@@ -1,0 +1,6 @@
+Param([parameter(Mandatory=$true)][alias("User")]$UserName, [parameter(Mandatory=$true)][alias("Picture")]$PicturePath)
+
+Import-Module ActiveDirectory
+
+$user = Get-ADUser $UserName -Properties thumbnailPhoto
+$user.thumbnailPhoto | Set-Content $PicturePath -Encoding byte
