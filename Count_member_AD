@@ -1,0 +1,2 @@
+$a = Read-Host "ведите название группы"
+(Get-ADGroupMember -Identity $a ).Count
