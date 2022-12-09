@@ -1,0 +1,60 @@
+:: @echo off
+chcp 1251 >nul
+
+setlocal
+
+
+set file="%APPDATA%\1C\1CEStart\1cestart.cfg"
+set direct=%APPDATA%\1C\1CEStart\
+set Find=CommonInfoBases=\\spb1-febapp01\1C_Platform\1C\BaseList\4_Зарплата_и_ управление_персоналом_(Рабочая).v8i
+set Find2=AppAutoInstallLastVersion=0
+
+:step1
+:: Проверка наличия фала 1cestart.cfg в папке пользователя
+if exist %file% goto step2
+
+:: Создает файл при отсутсвии
+echo %Find%>%file%
+echo %Find2% >>%file% 
+goto :end
+
+:: Проверяет свободен ли он для редактирования
+:step2
+rename %file% 1cestart_temp.cfg
+:: Возврат на проверку пока фал не станет свободен
+if %errorlevel% EQU 0 goto step3
+:: Задержка для проверки
+ELSE
+sleep 10
+go to step2
+
+:step3
+::Перекодировка файла из UTF-16 to Win-1251
+@<"%direct%1cestart_temp.cfg">"%file%" (for /f "delims=" %%i in ('find/n /v ""') do @chcp 1251>nul& set x=%%i& cmd/v/c echo[!x:*]^^=!)
+
+del %APPDATA%\1C\1CEStart\1cestart_temp.cfg
+
+::В случае если файл существует и не занят то ищет строку и если ее нет то добавляет, если строка есть то переходит к проверке сл строки
+
+FIND /C /I "%Find%" %file%
+@if %errorlevel% EQU 0 goto step4
+
+::Добавляет строку Find в файл при отсутствии
+
+echo %Find% >>%file%
+
+
+::Проверка записи Find2 в конфиге
+:step4
+FIND /C /I "%Find2%" %file%
+@if %errorlevel% EQU 0 goto end
+
+::Добавляет строку Find2 в файл при отсутствии
+
+echo %Find2% >>%file%
+
+
+
+:end
+
+
